@@ -6,8 +6,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 /**
- * A class of bags whose entries are stored in a chain of linked nodes.
- * The bag is never full.
+ * A class to act as a StartingPoint for Graphics/Mechanics Modules.
+ * Substitute for the "GameManager" during development.
+ * Allows for testing of in-game graphics and mechanics.
+ * Sets up a default level of the game.
  *
  * @author Heather Bradfield
  * @version 09/11/2016
@@ -16,17 +18,19 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
 
     private Image i;
     private Graphics doubleG;
-    ArrayList<ArrayList<Pair>> targets = new ArrayList<>();
+    private ArrayList<ArrayList<Pair>> targets = new ArrayList<>();
     private ArrayList<Fly> flies = new ArrayList<>();
     private Frog frog;
     private int targetSum;
-    private int score = 0;
-    private int waterX = 0;
+    private int maxTarget = 10;
     private Image water;
-    private boolean flyClick = false;
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Initializes applet window size and MouseListener.
+     * Imports background Image.
+     *
+     * TODO: create Menus, Level Map, and actual Game Manager
+     * TODO: fix background image import
      */
     @Override
     public void init() {
@@ -35,39 +39,37 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
         water = getImage(getDocumentBase(),"Images/background.png");
     }
 
-    /**
-     * Counts the number of times a given entry appears in this bag.
-     */
-    private void addMouseListener(StartingPoint sp) {
-
-    }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Starts default level.
+     * Generates possible pairs for all targets.
+     * Generates swarm of flies.
+     * Starts new Thread.
+     * TODO: create Level class with increasing levels of difficulty
      *
      */
     @Override
     public void start() {
         Random r = new Random();
-        targetSum = r.nextInt(8)+2;
-        frog = new Frog();
 
-        int maxTarget = 10;
-        generateTargets(targets, maxTarget);
+        targetSum = r.nextInt(8)+2;
+        generatePairs(targets, maxTarget);
         generateFlies(targets, targetSum);
-        score += 1;
+
+        frog = new Frog();
 
         Thread thread = new Thread(this);
         thread.start();
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Given the maxTarget num, for all nums 2 to maxTarget
+     * generate Pairs of flies that sum up to a target.
      *
-     * @param targets the entry to be counted
-     * @param maxTarget the entry to be counted
+     * @param targets the List of targets and their corresponding pairs of flies
+     * @param maxTarget the max target number
      */
-    public void generateTargets(ArrayList<ArrayList<Pair>> targets, int maxTarget) {
+    public void generatePairs(ArrayList<ArrayList<Pair>> targets, int maxTarget) {
         ArrayList<Pair> sums;
         Pair p;
         Fly f1, f2;
@@ -89,10 +91,10 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Generates a swarm of flies.
      *
-     * @param targets the entry to be counted
-     * @param targetSum the entry to be counted
+     * @param targets the List of targets and their corresponding pairs of flies
+     * @param targetSum the target number for the current level
      */
     public void generateFlies(ArrayList<ArrayList<Pair>> targets, int targetSum) {
         for (int i = 0; i < targets.get(targetSum - 2).size(); i++) {
@@ -103,7 +105,7 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Runs the applet and updates graphics.
      *
      */
     @Override
@@ -111,7 +113,7 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
         //thread info
         while (true) {
             for (Fly f : flies) {
-                f.update(this);
+                f.update(this,f);
                 frog.update(this,f);
             }
             repaint();
@@ -124,8 +126,8 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
-     *
+     * Stops the applet.
+     * TODO: implement drop down menu with option to pause game.
      */
     @Override
     public void stop() {
@@ -133,7 +135,8 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Terminates the applet.
+     * TODO: implement drop down menu with option to exit game.
      *
      */
     @Override
@@ -142,14 +145,14 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Display old pixels and repaint over (double buffering)
+     * Deals with flickering problems.
      *
-     * @param g the entry to be counted
+     * @param g the game graphics
      */
     @Override
     public void update(Graphics g) {
-        //display old pixels and repaint over (double buffering)
-        //deals with flickering problems
+
         if (i == null) {
             i = createImage(this.getWidth(),this.getHeight());
             doubleG = i.getGraphics();
@@ -164,32 +167,37 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Paints graphics, images, titles.
+     * TODO: paint current level number
      *
-     * @param g the entry to be counted
+     * @param g the game graphics
      */
     @Override
     public void paint(Graphics g) {
         g.setColor(new Color(44,185,255));
         g.fillRect(0,0,getWidth(),getHeight());
-        g.drawImage(water,waterX,0,this);
+        g.drawImage(water,0,0,this);
         frog.paint(g);
 
         for (Fly f : flies) {
             f.paint(g);
         }
 
+        String gameTitle = "FROG MATH";
         String t = Integer.toString(targetSum);
         Font font = new Font("Serif",Font.BOLD,72);
         g.setFont(font);
         g.setColor(new Color(162,5,240));
+        //g.drawString(gameTitle,10,100);
         g.drawString(t,getWidth()-100,100);
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Checks if the mouse has clicked a fly.
+     * TODO: if fly is selected, paint "selection circle" around fly.
+     * TODO: paint fly's number on frog.
      *
-     * @param e the entry to be counted
+     * @param e the mouse event being checked
      */
     public void mouseClicked(MouseEvent e) {
         for (Fly f : flies) {
@@ -204,15 +212,22 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
         }
     }
 
+    /**
+     * Checks if the mouse has pressed on fly.
+     * TODO: if fly is selected, paint "selection circle" around fly.
+     * TODO: paint fly's number on frog.
+     *
+     * @param e the mouse event being checked
+     */
     @Override
     public void mousePressed(MouseEvent e) {
 
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Checks if mouse was released.
      *
-     * @param e the entry to be counted
+     * @param e the mouse event being checked
      */
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -220,9 +235,9 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Checks if mouse entered a specific area in the applet
      *
-     * @param e the entry to be counted
+     * @param e the mouse event being checked
      */
     @Override
     public void mouseEntered(MouseEvent e) {
@@ -230,9 +245,9 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
     }
 
     /**
-     * Counts the number of times a given entry appears in this bag.
+     * Checks if mouse exited the applet.
      *
-     * @param e the entry to be counted
+     * @param e the mouse event being checked
      */
     @Override
     public void mouseExited(MouseEvent e) {
@@ -241,33 +256,4 @@ public class StartingPoint extends Applet implements Runnable, MouseListener{
 
 }
 
-class Pair {
-    private double x;
-    private double y;
-    private Fly f1;
-    private Fly f2;
-
-    Pair (Fly one, Fly two) {
-        this.f1 = one;
-        this.f2 = two;
-        this.x = f1.getNum();
-        this.y = f2.getNum();
-    }
-
-    public Fly getF1() {
-        return f1;
-    }
-
-    public Fly getF2() {
-        return f2;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-}
 
