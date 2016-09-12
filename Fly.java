@@ -11,33 +11,28 @@ public class Fly {
     private double dx = 0.5;
     private double dy = 0.5;
     private double radius = 20; //pixels
-    private int num;
-    private double numX;
-    private double numY;
+    private int num = 0;
+    private double numX = 0;
+    private double numY = 0;
+    private boolean flyClick = false;
 
 
-    public Fly() {
-        Random r = new Random();  //FIX
-        this.x = r.nextInt(100);
+    public Fly(int num) {
+        Random r = new Random();
+        this.x = r.nextInt(400) + 20 * 5;
         this.numX = this.x + 2;
-        this.y = r.nextInt(200) + 50;
+        r = new Random();
+        this.y = r.nextInt(400) + 20;
         this.numY = this.y + 2;
-        this.num = r.nextInt(11);
-    }
-
-    public Fly(int i, int j) {
-        this.x = i;
-        this.numX = this.x + 2;
-        this.y = j;
-        this.numY = this.y + 2;
+        if (r.nextBoolean()) {
+            this.dx = -this.dx;
+            this.numX = -this.numX;
+        }
+        this.num = num;
     }
 
     public double getX() {
         return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
     }
 
     public double getY() {
@@ -46,14 +41,6 @@ public class Fly {
 
     public void setY(double y) {
         this.y = y;
-    }
-
-    public double getDx() {
-        return dx;
-    }
-
-    public void setDx(double dx) {
-        this.dx = dx;
     }
 
     public double getDy() {
@@ -68,10 +55,22 @@ public class Fly {
         return radius;
     }
 
-    public void setRadius(int radius) {
-        this.radius = radius;
+    public void setNum(int num) {
+        this.num = num;
     }
 
+    public double getNum() {
+        return this.num;
+    }
+
+    public void setFlyClick(Boolean b) {
+        this.flyClick = b;
+    }
+
+    public boolean getFlyClick()
+    {
+        return this.flyClick;
+    }
     public void update(StartingPoint sp) {
         if ((x + dx) > sp.getWidth() - radius - 1) {
             x = sp.getWidth() - radius - 1;
@@ -99,7 +98,14 @@ public class Fly {
 
         numX = x;
         numY = y;
+
+        checkForCollision();
     }
+
+    private void checkForCollision() {
+
+    }
+
 
     public void paint(Graphics g) {
         g.setColor(Color.MAGENTA);

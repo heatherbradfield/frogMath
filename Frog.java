@@ -7,6 +7,8 @@ public class Frog {
 
     private int x, y, width, height;
     private String operation;
+    private boolean num1 = false;
+    private boolean num2 = false;
 
     public Frog() {
         x = 325;
@@ -22,7 +24,7 @@ public class Frog {
 
     public void update(StartingPoint sp, Fly f) {
         checkForCollision(f);
-
+        sum(f);
     }
 
     private void checkForCollision(Fly f) {
@@ -38,8 +40,44 @@ public class Frog {
         }
     }
 
+    private void sum (Fly f) {
+        if (f.getFlyClick()) {
+
+        }
+    }
+
     public void paint(Graphics g) {
         g.setColor(Color.GREEN);
-        g.drawRect(this.x,this.y,this.width,this.height);
+        g.fillRect(this.x,this.y,this.width,this.height);
+    }
+}
+
+class Tongue {
+    private int x, y, dx, dy;
+    private int width, height;
+
+    Tongue (int x, int y) {
+        this.x = x;
+        this.y = y;
+        dx = 1;
+        dy = 1;
+        width = 5;
+        height = 10;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getY() {
+        return y;
     }
 }
