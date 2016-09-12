@@ -1,26 +1,44 @@
 import java.applet.Applet;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Created by Heather on 9/11/16.
  */
-public class StartingPoint extends Applet implements Runnable {
+public class StartingPoint extends Applet implements Runnable, MouseListener {
 
     private Image i;
     private Graphics doubleG;
-    Fly fly1, fly2, fly3, fly4;
+    Fly f[] = new Fly[2];
+    Frog frog;
+    int target;
+    int score;
+    int backgroundX = 0;
+    Image water;
+    boolean mouseClick = false;
+    
 
     @Override
     public void init() {
         setSize(800,600);
+        addMouseListener(this);
+        water = getImage(getCodeBase(), "background.png");
+    }
+
+    private void addMouseListener(StartingPoint sp) {
+
     }
 
     @Override
     public void start() {
-        fly1 = new Fly();
-        fly2 = new Fly(250,250);
-//        fly3 = new Fly();
-//        fly4 = new Fly();
+        frog = new Frog();
+        target = 0;
+        score = 0;
+
+        for (int i = 0; i < f.length; i++) {
+            f[i] = new Fly();
+        }
         Thread thread = new Thread(this);
         thread.start();
 
@@ -30,8 +48,10 @@ public class StartingPoint extends Applet implements Runnable {
     public void run() {
         //thread info
         while (true) {
-            fly1.update(this);
-            fly2.update(this);
+            for (int i = 0; i < f.length; i++) {
+                f[i].update(this);
+                frog.update(this,f[i]);
+            }
             repaint();
             try {
                 Thread.sleep(17); //60 FPS
@@ -71,8 +91,44 @@ public class StartingPoint extends Applet implements Runnable {
 
     @Override
     public void paint(Graphics g) {
-        fly1.paint(g);
-        fly2.paint(g);
+        g.drawImage(water,backgroundX,0,this);
+        frog.paint(g);
+        for (int i = 0; i < f.length; i++) {
+            f[i].paint(g);
+        }
+
+        String t = Integer.toString(target);
+        Font font = new Font("Serif",Font.BOLD,48);
+        g.setFont(font);
+        g.setColor(Color.RED);
+        g.drawString(t,getWidth()-150,50);
     }
 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getX() == f[1].getX()) {
+            mouseClick = true;
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
 }
+
